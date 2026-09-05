@@ -1,0 +1,9 @@
+{
+  "short_name": "Campus Recruitment",
+  "name": "Smart Inter-College Campus Recruitment Management System",
+  "icons": [],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#101b2d",
+  "background_color": "#f3f5f0"
+}
