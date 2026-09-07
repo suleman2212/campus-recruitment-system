@@ -2,6 +2,7 @@ package com.example.College_Placement_Management.Service;
 
 import com.example.College_Placement_Management.Entity.Company;
 import com.example.College_Placement_Management.Repository.CompanyRepository;
+import com.example.College_Placement_Management.configuration.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -11,6 +12,7 @@ import java.util.List;
 public class CompanyService {
     @Autowired
     CompanyRepository companyRepository;
+
     public Company insert(Company company)
     {
         return companyRepository.save(company);
@@ -23,23 +25,27 @@ public class CompanyService {
 
     public Company fetchbyid(Long id)
     {
-        return companyRepository.findById(id).orElse(null);
+        return companyRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Company not found with id: " + id));
     }
 
     public Company update(Long id, Company company)
     {
-        Company c=companyRepository.findById(id).orElse(null);
+        Company c = companyRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Company not found with id: " + id));
         c.setCompany_name(company.getCompany_name());
         c.setEmail(company.getEmail());
         c.setPhone(company.getPhone());
         c.setWebsite(company.getWebsite());
         c.setLocation(company.getLocation());
         return companyRepository.save(c);
-
     }
 
     public String delete(Long id)
     {
+        if (!companyRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Company not found with id: " + id);
+        }
         companyRepository.deleteById(id);
         return "data deleted successfully";
     }

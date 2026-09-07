@@ -8,6 +8,7 @@ import {
 } from '../api/collegeParticipation';
 import { fetchHiringRequirements } from '../api/hiringRequirements';
 import { fetchCompanies } from '../api/companies';
+import { fetchColleges } from '../api/colleges';
 
 const fields = [
   {
@@ -32,12 +33,20 @@ const fkFields = [
     optionsLoader: fetchCompanies,
     mapOption: (c) => ({ value: c.company_id, label: `${c.company_name} (#${c.company_id})` }),
   },
+  {
+    name: 'collegeId',
+    label: 'Participating College',
+    required: false,
+    optionsLoader: fetchColleges,
+    mapOption: (c) => ({ value: c.cid, label: `${c.cname} (#${c.cid})` }),
+  },
 ];
 
 const columns = [
   { key: 'pid', label: 'ID', render: (r) => <span className="id-chip">#{r.pid}</span> },
   { key: 'requirement', label: 'Requirement', render: (r) => r.hiringRequirement?.jobRole || '—' },
   { key: 'company', label: 'Company', render: (r) => r.company?.company_name || '—' },
+  { key: 'college', label: 'College', render: (r) => r.college?.cname || '—' },
   {
     key: 'selection_status',
     label: 'Status',
@@ -54,17 +63,23 @@ export default function CollegeParticipation() {
     <CrudPage
       eyebrow="Hiring pipeline · 07"
       title="College participation"
-      description="Which companies a hiring requirement is being matched against."
+      description="Which colleges and companies a hiring requirement is being matched against."
       idKey="pid"
       listFn={fetchParticipations}
-      createFn={(values, fk) => createParticipation(values, fk.requirementId, fk.companyId)}
+      createFn={(values, fk) => {
+        const payload = { ...values };
+        if (fk.collegeId) {
+          payload.college = { cid: Number(fk.collegeId) };
+        }
+        return createParticipation(payload, fk.requirementId, fk.companyId);
+      }}
       updateFn={(id, values) => updateParticipation(id, values)}
       deleteFn={deleteParticipation}
       columns={columns}
       fields={fields}
       fkFields={fkFields}
       readOnly={readOnly}
-      readOnlyNote="Eligible colleges are grouped automatically based on company requirements and region. You can see the grouping here."
+      readOnlyNote="Eligible colleges are grouped based on company requirements and region. You can track participation records here."
     />
   );
 }

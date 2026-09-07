@@ -6,9 +6,9 @@ import com.example.College_Placement_Management.Entity.Job_Notification;
 import com.example.College_Placement_Management.Repository.CompanyRepository;
 import com.example.College_Placement_Management.Repository.HiringRRepository;
 import com.example.College_Placement_Management.Repository.Job_nRepository;
+import com.example.College_Placement_Management.configuration.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -24,16 +24,20 @@ public class HiringRService {
 
     public HiringRequirement insert(HiringRequirement hiringRequirement, Long cid)
     {
-        Company company=companyRepository.findById(cid).orElse(null);
+        Company company = companyRepository.findById(cid)
+                .orElseThrow(() -> new ResourceNotFoundException("Company not found with id: " + cid));
         hiringRequirement.setCompany(company);
+        if (hiringRequirement.getCreated_date() == null) {
+            hiringRequirement.setCreated_date(System.currentTimeMillis());
+        }
         HiringRequirement saved = hiringRRepository.save(hiringRequirement);
 
-        // Automatically publish a notification the moment a company sends a
+        // Automatically publish a notification the moment a company posts a
         // hiring requirement, so students / colleges see a pop-up alert.
         Job_Notification notification = new Job_Notification();
         notification.setHiringRequirement(saved);
-        String companyName = company != null ? company.getCompany_name() : "A company";
-        notification.setTitle(companyName + " is hiring: " + saved.getJobRole());
+        String companyName = company.getCompany_name() != null ? company.getCompany_name() : "A company";
+        notification.setTitle(companyName + " is hiring: " + safe(saved.getJobRole()));
         notification.setDiscription(
                 "New " + safe(saved.getJob_type()) + " opening for " + safe(saved.getJobRole()) +
                 " at " + companyName +
@@ -58,12 +62,14 @@ public class HiringRService {
 
     public HiringRequirement fetchbyid(Long id)
     {
-        return hiringRRepository.findById(id).orElse(null);
+        return hiringRRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Hiring requirement not found with id: " + id));
     }
 
     public HiringRequirement update(Long id, HiringRequirement hiringRequirement)
     {
-        HiringRequirement h=hiringRRepository.findById(id).orElse(null);
+        HiringRequirement h = hiringRRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Hiring requirement not found with id: " + id));
         h.setJob_type(hiringRequirement.getJob_type());
         h.setJobRole(hiringRequirement.getJobRole());
         h.setRequired_candidates(hiringRequirement.getRequired_candidates());
@@ -72,13 +78,17 @@ public class HiringRService {
         h.setEligible_branches(hiringRequirement.getEligible_branches());
         h.setTarget_region(hiringRequirement.getTarget_region());
         h.setApplication_deadline(hiringRequirement.getApplication_deadline());
-        h.setCreated_date(hiringRequirement.getCreated_date());
+        if (hiringRequirement.getCreated_date() != null) {
+            h.setCreated_date(hiringRequirement.getCreated_date());
+        }
         return hiringRRepository.save(h);
-
     }
 
     public String delete(Long id)
     {
+        if (!hiringRRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Hiring requirement not found with id: " + id);
+        }
         hiringRRepository.deleteById(id);
         return "data deleted successfully";
     }

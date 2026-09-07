@@ -11,8 +11,8 @@ const fields = [
 
 const columns = [
   { key: 'company_id', label: 'ID', render: (r) => <span className="id-chip">#{r.company_id}</span> },
-  { key: 'company_name', label: 'Company' },
-  { key: 'location', label: 'Location' },
+  { key: 'company_name', label: 'Company', render: (r) => r.company_name || r.companyName || '—' },
+  { key: 'location', label: 'Location', render: (r) => r.location || r.Location || '—' },
   { key: 'email', label: 'Email' },
   { key: 'website', label: 'Website' },
   { key: 'phone', label: 'Phone' },
@@ -26,8 +26,24 @@ export default function Companies() {
       description="Recruiters hiring through the placement cell."
       idKey="company_id"
       listFn={fetchCompanies}
-      createFn={(values) => createCompany(values)}
-      updateFn={(id, values) => updateCompany(id, values)}
+      createFn={(values) =>
+        createCompany({
+          ...values,
+          Location: values.location,
+          location: values.location,
+          company_name: values.company_name,
+          companyName: values.company_name,
+        })
+      }
+      updateFn={(id, values) =>
+        updateCompany(id, {
+          ...values,
+          Location: values.location,
+          location: values.location,
+          company_name: values.company_name,
+          companyName: values.company_name,
+        })
+      }
       deleteFn={deleteCompany}
       columns={columns}
       fields={fields}

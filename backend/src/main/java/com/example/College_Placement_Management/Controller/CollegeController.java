@@ -13,55 +13,30 @@ import java.util.List;
 @RequestMapping("/college")
 public class CollegeController {
     @Autowired
-    CollegeService collegeService;
+    private CollegeService collegeService;
 
     @PostMapping("/insert")
-    public ResponseEntity<College> insertdata(@RequestBody College college)
-    {
-        try {
-            return ResponseEntity.ok(collegeService.insertdata(college));
-        } catch (Exception e) {
-            return (ResponseEntity<College>) ResponseEntity.badRequest();
-        }
+    public ResponseEntity<College> insertdata(@RequestBody College college) {
+        return new ResponseEntity<>(collegeService.insertdata(college), HttpStatus.CREATED);
     }
 
     @GetMapping("/fetch")
-    public ResponseEntity<List<College>> fetch()
-    {
-        try {
-            return ResponseEntity.ok(collegeService.fetch());
-        }catch (Exception e){
-            return (ResponseEntity<List<College>>) ResponseEntity.badRequest();
-        }
+    public ResponseEntity<List<College>> fetch() {
+        return ResponseEntity.ok(collegeService.fetch());
     }
 
     @GetMapping("/fetch/{id}")
-    public ResponseEntity<College> fetchdata(@PathVariable Long id)
-    {
-        try {
-            return ResponseEntity.ok(collegeService.fetchdata(id));
-        }catch (Exception e){
-            return (ResponseEntity<College>) ResponseEntity.badRequest();
-        }
+    public ResponseEntity<College> fetchdata(@PathVariable Long id) {
+        return ResponseEntity.ok(collegeService.fetchdata(id));
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<College> updateCollege(@PathVariable Long id, @RequestBody College college)
-    {
-        try {
-            return ResponseEntity.ok(collegeService.updateCollege(id, college));
-        }catch (Exception e){
-            return (ResponseEntity<College>) ResponseEntity.badRequest();
-        }
+    public ResponseEntity<College> updateCollege(@PathVariable Long id, @RequestBody College college) {
+        return ResponseEntity.ok(collegeService.updateCollege(id, college));
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<String> deleteCollege(@PathVariable Long id)
-    {
-        try {
-            return ResponseEntity.ok(collegeService.deleteCollege(id));
-        } catch (Exception e) {
-            return (ResponseEntity<String>) ResponseEntity.badRequest();
-        }
+    public ResponseEntity<String> deleteCollege(@PathVariable Long id) {
+        return ResponseEntity.ok(collegeService.deleteCollege(id));
     }
 }

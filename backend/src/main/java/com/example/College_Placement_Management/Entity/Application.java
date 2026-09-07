@@ -8,14 +8,13 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-
 @Entity
 public class Application {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long application_id;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name="student_id")
     private Student student;
 

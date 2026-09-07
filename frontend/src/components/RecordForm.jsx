@@ -54,7 +54,11 @@ export default function RecordForm({ fields, fkFields, editingRecord, onSubmit, 
     try {
       const payload = { ...values };
       fields.forEach((f) => {
-        if (f.type === 'number' && payload[f.name] !== '') payload[f.name] = Number(payload[f.name]);
+        if (payload[f.name] === '') {
+          payload[f.name] = null;
+        } else if (f.type === 'number') {
+          payload[f.name] = Number(payload[f.name]);
+        }
       });
       await onSubmit(payload, fkValues);
       if (!isEditing) {

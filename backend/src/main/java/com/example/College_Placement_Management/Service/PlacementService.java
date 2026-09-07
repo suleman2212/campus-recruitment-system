@@ -4,6 +4,7 @@ import com.example.College_Placement_Management.Entity.Application;
 import com.example.College_Placement_Management.Entity.Placement_result;
 import com.example.College_Placement_Management.Repository.ApplicationRepository;
 import com.example.College_Placement_Management.Repository.PlacementRepository;
+import com.example.College_Placement_Management.configuration.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,9 +16,11 @@ public class PlacementService {
     PlacementRepository placementRepository;
     @Autowired
     ApplicationRepository applicationRepository;
-    public Placement_result insert(Placement_result placementResult,Long aid)
+
+    public Placement_result insert(Placement_result placementResult, Long aid)
     {
-        Application application=applicationRepository.findById(aid).orElse(null);
+        Application application = applicationRepository.findById(aid)
+                .orElseThrow(() -> new ResourceNotFoundException("Application not found with id: " + aid));
         placementResult.setApplication(application);
         return placementRepository.save(placementResult);
     }
@@ -29,13 +32,14 @@ public class PlacementService {
 
     public Placement_result getByid(Long id)
     {
-        return placementRepository.findById(id).orElse(null);
+        return placementRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Placement result not found with id: " + id));
     }
 
-    public Placement_result update(Placement_result placementResult , Long id)
+    public Placement_result update(Placement_result placementResult, Long id)
     {
-        Placement_result pr =placementRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Placement result not found: " + id));
+        Placement_result pr = placementRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Placement result not found: " + id));
         pr.setSelection_status(placementResult.getSelection_status());
         pr.setPackage_offered(placementResult.getPackage_offered());
         pr.setRemarks(placementResult.getRemarks());
@@ -45,7 +49,10 @@ public class PlacementService {
 
     public String delById(Long id)
     {
+        if (!placementRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Placement result not found with id: " + id);
+        }
         placementRepository.deleteById(id);
-        return id+" is successfully deleted";
+        return id + " is successfully deleted";
     }
 }

@@ -6,6 +6,7 @@ import com.example.College_Placement_Management.Entity.Student;
 import com.example.College_Placement_Management.Repository.ApplicationRepository;
 import com.example.College_Placement_Management.Repository.HiringRRepository;
 import com.example.College_Placement_Management.Repository.StudentRepository;
+import com.example.College_Placement_Management.configuration.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,13 +21,15 @@ public class ApplicationService {
     @Autowired
     HiringRRepository hiringRRepository;
 
-    public Application insert(Application application,Long sid, Long rid)
+    public Application insert(Application application, Long sid, Long rid)
     {
-        Student student=studentRepository.findById(sid).orElse(null);
-        HiringRequirement hiringRequirement=hiringRRepository.findById(rid).orElse(null);
+        Student student = studentRepository.findById(sid)
+                .orElseThrow(() -> new ResourceNotFoundException("Student not found with id: " + sid));
+        HiringRequirement hiringRequirement = hiringRRepository.findById(rid)
+                .orElseThrow(() -> new ResourceNotFoundException("Hiring requirement not found with id: " + rid));
         application.setStudent(student);
         application.setHiringRequirement(hiringRequirement);
-         return applicationRepository.save(application);
+        return applicationRepository.save(application);
     }
 
     public List<Application> fetch()
@@ -36,19 +39,28 @@ public class ApplicationService {
 
     public Application fetchbyid(Long id)
     {
-        return applicationRepository.findById(id).orElse(null);
+        return applicationRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Application not found with id: " + id));
     }
 
     public Application update(Long id, Application application)
     {
-        Application a= applicationRepository.findById(id).orElse(null);
-        a.setApplication_status(application.getApplication_status());
-        a.setApplied_date(application.getApplied_date());
+        Application a = applicationRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Application not found with id: " + id));
+        if (application.getApplication_status() != null) {
+            a.setApplication_status(application.getApplication_status());
+        }
+        if (application.getApplied_date() != null) {
+            a.setApplied_date(application.getApplied_date());
+        }
         return applicationRepository.save(a);
     }
 
     public String delete(Long id)
     {
+        if (!applicationRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Application not found with id: " + id);
+        }
         applicationRepository.deleteById(id);
         return "data deleted successfully";
     }

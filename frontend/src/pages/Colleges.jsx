@@ -14,7 +14,7 @@ const fields = [
 
 const columns = [
   { key: 'cid', label: 'ID', render: (r) => <span className="id-chip">#{r.cid}</span> },
-  { key: 'cname', label: 'Name' },
+  { key: 'cname', label: 'Name', render: (r) => r.cname || r.Cname || '—' },
   { key: 'region', label: 'Region' },
   { key: 'pofficer', label: 'Officer' },
   { key: 'pemail', label: 'Email' },
@@ -29,8 +29,24 @@ export default function Colleges() {
       description="Institutions participating in campus recruitment."
       idKey="cid"
       listFn={fetchColleges}
-      createFn={(values) => createCollege(values)}
-      updateFn={(id, values) => updateCollege(id, values)}
+      createFn={(values) =>
+        createCollege({
+          ...values,
+          cname: values.cname,
+          Cname: values.cname,
+          addresss: values.addresss,
+          address: values.addresss,
+        })
+      }
+      updateFn={(id, values) =>
+        updateCollege(id, {
+          ...values,
+          cname: values.cname,
+          Cname: values.cname,
+          addresss: values.addresss,
+          address: values.addresss,
+        })
+      }
       deleteFn={deleteCollege}
       columns={columns}
       fields={fields}

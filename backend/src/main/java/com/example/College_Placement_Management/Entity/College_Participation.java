@@ -22,7 +22,10 @@ public class College_Participation {
     @JoinColumn(name="Company_id")
     private Company company;
 
+    @ManyToOne
+    @JoinColumn(name="college_id")
+    private College college;
+
     private String selection_status;
     private String selected_date;
 }
-

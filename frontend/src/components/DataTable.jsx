@@ -5,6 +5,24 @@ export default function DataTable({ columns, rows, idKey, onEdit, onDelete, empt
 
   const showActions = !!(onEdit || onDelete);
 
+  const getCellVal = (row, key) => {
+    if (!row || !key) return '—';
+    if (row[key] !== undefined && row[key] !== null && row[key] !== '') return row[key];
+    const upperKey = key.charAt(0).toUpperCase() + key.slice(1);
+    if (row[upperKey] !== undefined && row[upperKey] !== null && row[upperKey] !== '') return row[upperKey];
+    const lowerKey = key.charAt(0).toLowerCase() + key.slice(1);
+    if (row[lowerKey] !== undefined && row[lowerKey] !== null && row[lowerKey] !== '') return row[lowerKey];
+    return '—';
+  };
+
+  const getRowId = (row) => {
+    if (!row) return Math.random();
+    if (row[idKey] !== undefined && row[idKey] !== null) return row[idKey];
+    const upperId = idKey ? idKey.charAt(0).toUpperCase() + idKey.slice(1) : '';
+    if (row[upperId] !== undefined && row[upperId] !== null) return row[upperId];
+    return row.id ?? row.ID ?? Math.random();
+  };
+
   return (
     <div className="table-wrap">
       <table>
@@ -18,9 +36,9 @@ export default function DataTable({ columns, rows, idKey, onEdit, onDelete, empt
         </thead>
         <tbody>
           {rows.map((row) => (
-            <tr key={row[idKey]}>
+            <tr key={getRowId(row)}>
               {columns.map((col) => (
-                <td key={col.key}>{col.render ? col.render(row) : row[col.key] ?? '—'}</td>
+                <td key={col.key}>{col.render ? col.render(row) : getCellVal(row, col.key)}</td>
               ))}
               {showActions && (
                 <td>

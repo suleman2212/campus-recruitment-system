@@ -14,7 +14,7 @@ public class StudentRegisterRequest {
     private String email;
     private Long phone;
     private String branch;
-    private Integer cgpa;
+    private Double cgpa;
     private Long graduationYear;
     private String skills;
     private String linkedin;
