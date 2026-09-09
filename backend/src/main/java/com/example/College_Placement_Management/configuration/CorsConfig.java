@@ -13,24 +13,16 @@ import java.util.stream.Collectors;
 @Configuration
 public class CorsConfig {
 
-    @Value("${app.cors.allowed-origins:http://localhost:5173,http://localhost:3000}")
+    @Value("${app.cors.allowed-origins:*}")
     private String allowedOrigins;
 
     @Bean
     public CorsFilter corsFilter() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        List<String> origins = Arrays.stream(allowedOrigins.split(","))
-                .map(String::trim)
-                .collect(Collectors.toList());
-
-        if (origins.contains("*") || origins.isEmpty()) {
-            configuration.addAllowedOriginPattern("*");
-        } else {
-            for (String origin : origins) {
-                configuration.addAllowedOriginPattern(origin);
-            }
-        }
+        // Unconditionally allow all origin patterns so Vercel and localhost never fail
+        configuration.addAllowedOriginPattern("*");
+        
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setExposedHeaders(Arrays.asList("Authorization"));
