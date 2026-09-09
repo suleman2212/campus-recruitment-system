@@ -26,7 +26,11 @@ public class CorsConfig {
                 .map(String::trim)
                 .collect(Collectors.toList());
 
-        configuration.setAllowedOrigins(origins);
+        if (origins.contains("*")) {
+            configuration.setAllowedOriginPatterns(Arrays.asList("*"));
+        } else {
+            configuration.setAllowedOrigins(origins);
+        }
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setExposedHeaders(Arrays.asList("Authorization"));
